@@ -48,6 +48,7 @@ const validate = async (params) => {
     usd: yup.boolean().default(false),
     sort_by: yup.string().trim().lowercase().oneOf(Object.keys(SORTS)).default('name'),
     sort_direction: yup.string().trim().lowercase().oneOf(['asc', 'desc']).default('asc'),
+    product: yup.string().trim().default('')
   });
 
   if (typeof params.types === 'string') {
@@ -78,20 +79,36 @@ const validate = async (params) => {
 
 const getData = async (params = {}) => {
   const parsedParams = await validate(params);
+  var response = '';
 
   try {
-    const response = await axios.request({
-      method: 'GET',
-      url: 'https://api.bibit.id/products/list',
-      headers: {
-        Accept: 'application/json',
-        'Accept-Encoding': 'gzip',
-        Pragma: 'no-cache',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
-        Origin: 'https://bibit.id',
-      },
-      params: parsedParams,
-    });
+    if (params.product){
+      response = await axios.request({
+        method: 'GET',
+        url: 'https://api.bibit.id/products/'+params.product,
+        headers: {
+          Accept: 'application/json',
+          'Accept-Encoding': 'gzip',
+          Pragma: 'no-cache',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+          Origin: 'https://bibit.id',
+        },
+        params: "",
+      });
+    } else {
+      response = await axios.request({
+        method: 'GET',
+        url: 'https://api.bibit.id/products/list',
+        headers: {
+          Accept: 'application/json',
+          'Accept-Encoding': 'gzip',
+          Pragma: 'no-cache',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+          Origin: 'https://bibit.id',
+        },
+        params: parsedParams,
+      });
+    }
 
     return decrypt(response.data.data);
   } catch (error) {
