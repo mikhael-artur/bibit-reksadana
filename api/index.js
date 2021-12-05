@@ -81,6 +81,7 @@ const getData = async (params = {}) => {
   const parsedParams = await validate(params);
   var response = '';
 
+
   try {
     if (params.product){
       response = await axios.request({
